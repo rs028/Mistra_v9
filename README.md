@@ -7,32 +7,13 @@
                                 
                                 
 
-!
-! Copyright 1996-2017 the Authors
-!
-! Licensed under the EUPL, Version 1.1 only (the "Licence");
-!
-! You may not use this work except in compliance with the Licence.
-! You may obtain a copy of the Licence at:
-!   https://joinup.ec.europa.eu/software/page/eupl
-!
-! Unless required by applicable law or agreed to in writing,
-! software distributed under the Licence is distributed on an
-! "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
-! either express or implied.
-!
-! See the Licence for the specific language governing permissions
-! and limitations under the Licence.
+---
 
+__Mistra__ is 
 
-Unless specifically specified in each file and/or routine, the principal Authors are:
-  ** Andreas Bott ** (a.bott@uni-bonn.de)
-  ** Roland von Glasow **
+For the license see
 
-Additional work to make mistra code available, and significant technical changes in the code
-have been made by:
-  ** Josue Bock ** (josue.bock@meteo.fr)
-
+For Credits see
 
 
 HOW TO RUN MISTRA -- in a nutshell:
