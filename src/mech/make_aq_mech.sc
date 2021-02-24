@@ -3,7 +3,7 @@
 # edit master_aqueous.eqn file so that identical mechanisms for the aqueous phase are produced
 #
 # created by Roland von Glasow
-# updated in June 2016 by Josué Bock when upgrading KPP
+# updated in June 2016 by Josue Bock when upgrading KPP
 
 #
 # Copyright 1996-2017 the Authors
