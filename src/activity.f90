@@ -389,8 +389,8 @@ subroutine calpar(Iflag,NC,NA,T,b0,b1,C0,C1,omega,xs)
   integer,       intent(in) :: Iflag(NC,NA)
 
 ! Array arguments with intent(out):
-  real(kind=dp), dimension(nc,na), intent(out) :: b0, b1
-  real(kind=dp), dimension(nc,na), intent(out) :: c0, c1
+  real(kind=dp), intent(out) :: b0(nc,na), b1(nc,na)
+  real(kind=dp), intent(out) :: c0(nc,na), c1(nc,na)
 
   real(kind=dp), intent(out) :: omega(nc,na)
   real(kind=dp), intent(out) :: xs(11)

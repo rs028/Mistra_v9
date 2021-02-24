@@ -61,4 +61,7 @@ else
     echo "The executable does not exist, installation aborted" && exit 1
 fi
 
-echo " -- End of param script -- "
+# Move output files in OUTDIR
+mv fort.* *.out *.nc rst*.dat $OUTDIR
+
+echo " -- End of param script (end of the run) -- "

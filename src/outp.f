@@ -18,10 +18,10 @@
 
 
 ! outp.f : output
-! box: the initial (const*) and overview (prof*) output SRs are not adjusted, 
-!      i.e. they produce a heap of output that's irrelevant. To avoid huge 
+! box: the initial (const*) and overview (prof*) output SRs are not adjusted,
+!      i.e. they produce a heap of output that's irrelevant. To avoid huge
 !     output files, the size of the plou* SRs has been adjusted by using
-!     n_bl and n_bln. Output starts at k=1 to save the deposited/surface 
+!     n_bl and n_bln. Output starts at k=1 to save the deposited/surface
 !     values as well.
 
 ! This file contains the following subroutines:
@@ -73,6 +73,10 @@
      &     nkt,
      &     mb
 
+      USE precision, ONLY :
+! Imported Parameters:
+     &     dp
+
       implicit double precision (a-h,o-z)
 
 ! Local scalars:
@@ -91,22 +95,32 @@
       integer lday, lst, lmin, it, lcl, lct
 
       common /cb42/ atke(n),atkh(n),atkm(n),tke(n),tkep(n),buoy(n)
+      double precision atke, atkh, atkm, tke, tkep, buoy
       common /cb43/ gm(n),gh(n),sm(n),sh(n),xl(n)
+      double precision gm, gh, sm, sh, xl
       common /cb44/ g,a0m,b0m(nka),ug,vg,z0,ebs,psis,aks,
      &              bs,rhoc,rhocw,ebc,anu0,bs0,wmin,wmax,tw
       double precision g,a0m,b0m,ug,vg,z0,ebs,psis,aks,
      &              bs,rhoc,rhocw,ebc,anu0,bs0,wmin,wmax,tw
 
       common /cb45/ u(n),v(n),w(n)
+      double precision u, v, w
       common /cb47/ zb(nb),dzb(nb),dzbw(nb),tb(nb),eb(nb),ak(nb),d(nb),
      &              ajb,ajq,ajl,ajt,ajd,ajs,ds1,ds2,ajm,reif,tau,trdep
+      real (kind=dp) :: zb, dzb, dzbw, tb, eb, ak, d,
+     &     ajb, ajq, ajl, ajt, ajd, ajs, ds1, ds2, ajm, reif, tau, trdep
       common /cb48/ sk,sl,dtrad(n),dtcon(n)
       double precision sk, sl, dtrad, dtcon
 
       common /cb52/ ff(nkt,nka,n),fsum(n),nar(n)
+      real (kind=dp) :: ff, fsum
+      integer :: nar
+
       common /cb53/ theta(n),thetl(n),t(n),talt(n),p(n),rho(n)
-      double precision theta, thetl, t, talt, p, rho
+      real(kind=dp) :: theta, thetl, t, talt, p, rho
       common /cb54/ xm1(n),xm2(n),feu(n),dfddt(n),xm1a(n),xm2a(n)
+      real(kind=dp) :: xm1, xm2, feu, dfddt, xm1a, xm2a
+
       common /cb63/ fcs(nka),xmol3(nka)
 
 !- End of header ---------------------------------------------------------------
@@ -146,7 +160,7 @@
 ! integer single vars
      &     it,lcl,lct,lday,lmin,lst
       close (15)
- 
+
       end subroutine outm
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -222,6 +236,7 @@
       integer lday, lst, lmin, it, lcl, lct
 
       common /kinv_i/ kinv
+      integer :: kinv
       common /kpp_crys/ xcryssulf,xcrysss,xdelisulf,xdeliss
       common /kpp_l1/ cloudt(nkc,n)
       logical cloudt
@@ -308,8 +323,7 @@
       double precision xday,xst,xmin
 
 ! Local arrays:
-      double precision i0                    ! the local array where are written the photolysis rates,
-      dimension i0(nphrxn,n_bln) !    up to the selected level (1:n_bln)
+      double precision i0(nphrxn,n_bln)   ! the local array where are written the photolysis rates, up to the selected level (1:n_bln)
 
 ! Common blocks:
       common /band_rat/ photol_j(nphrxn,n)
@@ -378,7 +392,7 @@
 !   43. HOBr   44. BrNO2  45. BrNO3   46. Br2    47. BrCl    48. HI
 !   49. HOI    50. I2O2   51. INO2    52. INO3   53. I2      54. ICl
 !   55. IBr    56. CH3I   57. CH2I2   58. CH2ClI 59. C3H7I   60. DMSO
-!   61. CH3SO2 62. CH3SO3 63. CH3SO3H 64. CO     65. Cl2O2   66. DMOO    
+!   61. CH3SO2 62. CH3SO3 63. CH3SO3H 64. CO     65. Cl2O2   66. DMOO
 !   67. CH3S   68. CH3SO  69. MSIA    70. DMSO2  71. CH2BrI  72. CHBr2I
 !   73. C2H5I  74. HIO3   75. NUCV    76. SO3    77. HOSO2   78. CO2
 !   79. I2O    80. I2O3   81. I2O4    82. I2O5   83. INO     84. Br2O
@@ -427,8 +441,7 @@
       integer j,k, nmax
 
 ! Local arrays:
-      double precision i0
-      dimension i0(n_bl,j1)
+      double precision i0(n_bl,j1)
 
 ! Common blocks:
       common /cb40/ time,lday,lst,lmin,it,lcl,lct
@@ -477,8 +490,8 @@
 !   11. O2-     12. NO2-    13. NO3-    14. Cl-       15. Cl2-
 !   16. HCOO-   17. Fe3+    18. Mn2+    19. HSO4-     20. Na+ (check electroneg)
 !   21. NO4-    22. ClO-    23. ClOH-   24. Br-       25. Br2-
-!   26. BrO-    27. BrOH-   28. BrCl2-  29. Br2Cl-    30. CH3SO3-     
-!   31. HSO5-   32. SO3-    33. SO5-    34. I-        35. IO2-        
+!   26. BrO-    27. BrOH-   28. BrCl2-  29. Br2Cl-    30. CH3SO3-
+!   31. HSO5-   32. SO3-    33. SO5-    34. I-        35. IO2-
 !   36. IO3-    37. ICl2-   38. IBr2-   39. MS-       40. Hg+
 !   41. Hg2+    42. HgOH+   43. HgCl+   44. HgCl3-    45. HgCl42-
 !   46. HgBr+   47. HgBr3-  48. HgBr42- 49. Hg(SO3)22- 50. --
@@ -522,8 +535,7 @@
       character (len=10) fname
 
 ! Local arrays:
-      double precision i0
-      dimension i0(n_bl,j6,nkc_l)
+      double precision i0(n_bl,j6,nkc_l)
 
 ! Common blocks:
       common /cb40/ time,lday,lst,lmin,it,lcl,lct
@@ -583,7 +595,7 @@
 !   43. HOBr   44. BrNO2  45. BrNO3   46. Br2    47. BrCl    48. HI
 !   49. HOI    50. I2O2   51. INO2    52. INO3   53. I2      54. ICl
 !   55. IBr    56. CH3I   57. CH2I2   58. CH2ClI 59. C3H7I   60. DMSO
-!   61. CH3SO2 62. CH3SO3 63. CH3SO3H 64. CO     65. Cl2O2   66. DMOO    
+!   61. CH3SO2 62. CH3SO3 63. CH3SO3H 64. CO     65. Cl2O2   66. DMOO
 !   67. CH3S   68. CH3SO  69. MSIA    70. DMSO2  71. CH2BrI  72. CHBr2I
 !   73. C2H5I  74. HIO3   75. NUCV    76. SO3    77. HOSO2   78. CO2
 !   79. I2O    80. I2O3   81. I2O4    82. I2O5   83. INO     84. Br2O
@@ -626,7 +638,11 @@
      &     nka,
      &     nkt
 
- 
+      USE precision, ONLY :
+! Imported Parameters:
+     &     dp
+
+
       implicit double precision (a-h,o-z)
 
 ! Subroutine arguments
@@ -639,27 +655,26 @@
       integer i,j,k, nmax
 
 ! Local arrays:
-      double precision i0,irc,icw
-      dimension i0(n_bl,j2,nkc_l),irc(n_bl,nkc_l),icw(n_bl,nkc_l)
+      double precision i0(n_bl,j2,nkc_l),irc(n_bl,nkc_l),icw(n_bl,nkc_l)
 
 ! Common blocks:
       common /blck11/ rc(nkc,n)
       common /blck12/ cw(nkc,n),cm(nkc,n)
       common /blck17/ sl1(j2,nkc,n),sion1(j6,nkc,n)
       common /cb40/ time,lday,lst,lmin,it,lcl,lct
-      double precision time
-      integer lday, lst, lmin, it, lcl, lct
+      real (kind=dp) :: time
+      integer :: lday, lst, lmin, it, lcl, lct
 
       common /cb41/ detw(n),deta(n),eta(n),etw(n)
-      double precision detw, deta, eta, etw
+      real (kind=dp) :: detw, deta, eta, etw
 
       common /cb50/ enw(nka),ew(nkt),rn(nka),rw(nkt,nka),en(nka),
      &              e(nkt),dew(nkt),rq(nkt,nka)
-      double precision enw,ew,rn,rw,en,e,dew,rq
+      real (kind=dp) :: enw,ew,rn,rw,en,e,dew,rq
 
       common /cb52/ ff(nkt,nka,n),fsum(n),nar(n)
-      double precision ff, fsum
-      integer nar
+      real (kind=dp) :: ff, fsum
+      integer :: nar
 
 !- End of header ---------------------------------------------------------------
 
@@ -696,7 +711,7 @@
          do k=1,n_bl
             irc(k,kc)=rc(kc,k) ! jjb this transposition is maybe useless, just to stick to old write
             icw(k,kc)=cw(kc,k)
-         enddo      
+         enddo
       enddo
  3000 continue
       open (63, file=fname,status='old',form='unformatted',
@@ -713,7 +728,7 @@
 
 
 ! output of radical species s3:
-! species 1-3 are treated as long lived 
+! species 1-3 are treated as long lived
 !    1. ----    2. ----    3. ---     4. OH      5. HO2
 !    6. AHO2    7. MCO3    8. CH3OO   9. ETO2   10. KO2
 !   11. R3O2   12. RAO2   13. TO2    14. TCO3   15. ZO2
@@ -925,6 +940,10 @@
      &     nka,
      &     nkt
 
+      USE precision, ONLY :
+! Imported Parameters:
+     &     dp
+
       implicit double precision (a-h,o-z)
 
       common /cb15/ fnseb,flgeg,hr(nrlay)
@@ -938,17 +957,24 @@
       double precision detw, deta, eta, etw
 
       common /cb42/ atke(n),atkh(n),atkm(n),tke(n),tkep(n),buoy(n)
+      double precision atke, atkh, atkm, tke, tkep, buoy
       common /cb47/ zb(nb),dzb(nb),dzbw(nb),tb(nb),eb(nb),ak(nb),d(nb),
      &              ajb,ajq,ajl,ajt,ajd,ajs,ds1,ds2,ajm,reif,tau,trdep
+      real (kind=dp) :: zb, dzb, dzbw, tb, eb, ak, d,
+     &     ajb, ajq, ajl, ajt, ajd, ajs, ds1, ds2, ajm, reif, tau, trdep
       common /cb48/ sk,sl,dtrad(n),dtcon(n)
       double precision sk, sl, dtrad, dtcon
 
       common /cb52/ ff(nkt,nka,n),fsum(n),nar(n)
+      real (kind=dp) :: ff, fsum
+      integer :: nar
+
       common /cb53/ theta(n),thetl(n),t(n),talt(n),p(n),rho(n)
-      double precision theta, thetl, t, talt, p, rho
+      real(kind=dp) :: theta, thetl, t, talt, p, rho
       common /cb54/ xm1(n),xm2(n),feu(n),dfddt(n),xm1a(n),xm2a(n)
-      double precision i0
-      dimension i0(12,n_bln)
+      real(kind=dp) :: xm1, xm2, feu, dfddt, xm1a, xm2a
+
+      double precision i0(12,n_bln)
       character *10 fname
       character *1 fogtype
       do k=1,n_bln
@@ -994,9 +1020,25 @@
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       subroutine ploutp (fogtype)
 ! output of particle distributions
-      double precision ff,fsum,xm1,xm2,feu,dfddt,xm1a,xm2a
 
-      parameter (nf=100,n=nf+50,nka=70,nkt=70)
+
+! 22-Sep-2020   Josue Bock   Remove remaining hard coded nf,n,nka, nkt parameter values
+
+       USE global_params, ONLY :
+! Imported Parameters:
+     &     n,
+     &     nka,
+     &     nkt
+
+      USE precision, ONLY :
+! Imported Parameters:
+     &     dp
+
+      implicit none
+
+      integer :: kk, ia, jt, k     ! loop indexes
+      real (kind=dp) :: x0, x1, x2
+
       common /cb40/ time,lday,lst,lmin,it,lcl,lct
       double precision time
       integer lday, lst, lmin, it, lcl, lct
@@ -1005,8 +1047,13 @@
       double precision detw, deta, eta, etw
 
       common /cb52/ ff(nkt,nka,n),fsum(n),nar(n)
+      real (kind=dp) :: ff, fsum
+      integer :: nar
+
       common /cb54/ xm1(n),xm2(n),feu(n),dfddt(n),xm1a(n),xm2a(n)
-      dimension ff2(nka,nkt)
+      real(kind=dp) :: xm1, xm2, feu, dfddt, xm1a, xm2a
+
+      real(kind=dp) :: ff2(nka,nkt)
       character *10 fname
       character *1 fogtype
       fname='f1 .out'
@@ -1098,6 +1145,10 @@
      &     mb,
      &     mbs
 
+      USE precision, ONLY :
+! Imported Parameters:
+     &     dp
+
       implicit double precision (a-h,o-z)
 
       common /cb10/ totrad (mb,nrlay)
@@ -1118,6 +1169,9 @@
       double precision enw,ew,rn,rw,en,e,dew,rq
 
       common /cb52/ ff(nkt,nka,n),fsum(n),nar(n)
+      real (kind=dp) :: ff, fsum
+      integer :: nar
+
       common /kurz/ fs1(nrlev),fs2(nrlev),totds(nrlev),ss(nrlev),
      &              fsn(nrlev),dtdts(nrlay)
       double precision fs1, fs2, totds, ss, fsn, dtdts
@@ -1125,8 +1179,7 @@
       common /lang/ fl1(nrlev),fl2(nrlev),fln(nrlev),dtdtl(nrlay)
       double precision fl1, fl2, fln, dtdtl
 
-      double precision i0
-      dimension i0(12,n_bln)
+      double precision i0(12,n_bln)
       character *10 fname
       character *1 fogtype
       do k=1,n_bln
@@ -1184,21 +1237,40 @@
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       subroutine ploutt (fogtype,n_bln)
 ! output of turbulence data
+
+
+! 22-Sep-2020   Josue Bock   Remove remaining hard coded nf,n,nka, nkt parameter values
+
+      USE global_params, ONLY :
+! Imported Parameters:
+     &     n
+
+      USE precision, ONLY :
+! Imported Parameters:
+     &     dp
+
       implicit double precision (a-h,o-z)
-      parameter (nf=100,n=nf+50)
+
       common /cb40/ time,lday,lst,lmin,it,lcl,lct
-      double precision time
+      real (kind=dp) :: time
       integer lday, lst, lmin, it, lcl, lct
 
       common /cb41/ detw(n),deta(n),eta(n),etw(n)
-      double precision detw, deta, eta, etw
+      real (kind=dp) :: detw, deta, eta, etw
 
       common /cb42/ atke(n),atkh(n),atkm(n),tke(n),tkep(n),buoy(n)
+      real (kind=dp) :: atke, atkh, atkm, tke, tkep, buoy
+
       common /cb42a/ tkeps(n),tkepb(n),tkepd(n)
+      real (kind=dp) :: tkeps, tkepb, tkepd
+
       common /cb43/ gm(n),gh(n),sm(n),sh(n),xl(n)
+      real (kind=dp) :: gm, gh, sm, sh, xl
+
       common /cb45/ u(n),v(n),w(n)
-      double precision i0
-      dimension i0(12,n_bln)
+      real (kind=dp) :: u, v, w
+
+      real (kind=dp) :: i0(12,n_bln)
       character *10 fname
       character *1 fogtype
       do k=1,n_bln
@@ -1252,6 +1324,10 @@
      &     nrlay,
      &     nrlev
 
+      USE precision, ONLY :
+! Imported Parameters:
+     &     dp
+
       implicit double precision (a-h,o-z)
 ! output of constants and parameters used in the current run
 
@@ -1259,26 +1335,32 @@
       common /band_o3/ scaleo3_m
       common /blck06/ kw(nka),ka
       common /cb18/ alat,declin                ! for the SZA calculation
-      double precision alat,declin
+      real (kind=dp) :: alat,declin
+      real (kind=dp) :: xsum(n)
 
       common /cb41/ detw(n),deta(n),eta(n),etw(n)
-      double precision detw, deta, eta, etw
+      real (kind=dp) :: detw, deta, eta, etw
 
       common /cb44/ g,a0m,b0m(nka),ug,vg,z0,ebs,psis,aks,
      &              bs,rhoc,rhocw,ebc,anu0,bs0,wmin,wmax,tw
-      double precision g,a0m,b0m,ug,vg,z0,ebs,psis,aks,
+      real (kind=dp) :: g,a0m,b0m,ug,vg,z0,ebs,psis,aks,
      &              bs,rhoc,rhocw,ebc,anu0,bs0,wmin,wmax,tw
 
       common /cb47/ zb(nb),dzb(nb),dzbw(nb),tb(nb),eb(nb),ak(nb),d(nb),
      &              ajb,ajq,ajl,ajt,ajd,ajs,ds1,ds2,ajm,reif,tau,trdep
+      real (kind=dp) :: zb, dzb, dzbw, tb, eb, ak, d,
+     &     ajb, ajq, ajl, ajt, ajd, ajs, ds1, ds2, ajm, reif, tau, trdep
       common /cb50/ enw(nka),ew(nkt),rn(nka),rw(nkt,nka),en(nka),
      &              e(nkt),dew(nkt),rq(nkt,nka)
-      double precision enw,ew,rn,rw,en,e,dew,rq
+      real (kind=dp) :: enw,ew,rn,rw,en,e,dew,rq
 
       common /cb51/ dlgew,dlgenw,dlne
-      common /cb52/ ff(nkt,nka,n),fsum(n),nar(n)
+      real (kind=dp) :: dlgew,dlgenw,dlne
 
-      dimension xsum(n)
+      common /cb52/ ff(nkt,nka,n),fsum(n),nar(n)
+      real (kind=dp) :: ff, fsum
+      integer :: nar
+
       write (26,6000)
  6000 format (16x,'constants and parameters of the current run'
      & ,///,6x,'numerical grid',/,6x,'eta:')
@@ -1365,7 +1447,7 @@
          xsum(k)=xsum(k)*1.e+09
          xxsum=xxsum+xsum(k)*detw(k)
       enddo
-      write (26,6240) 
+      write (26,6240)
  6240 format (/,6x,'aerosol mass in ug m**-3 in layers 2 - nf')
       write (26,6250) xsum
  6250 format (1x,15f8.3)
@@ -1458,6 +1540,10 @@
      &     nkt,
      &     mbs
 
+      USE precision, ONLY :
+! Imported Parameters:
+     &     dp
+
       implicit double precision (a-h,o-z)
 
       common /cb16/ u0,albedo(mbs),thk(nrlay)
@@ -1471,16 +1557,22 @@
       double precision detw, deta, eta, etw
 
       common /cb42/ atke(n),atkh(n),atkm(n),tke(n),tkep(n),buoy(n)
+      double precision atke, atkh, atkm, tke, tkep, buoy
       common /cb43/ gm(n),gh(n),sm(n),sh(n),xl(n)
+      double precision gm, gh, sm, sh, xl
       common /cb44/ g,a0m,b0m(nka),ug,vg,z0,ebs,psis,aks,
      &              bs,rhoc,rhocw,ebc,anu0,bs0,wmin,wmax,tw
       double precision g,a0m,b0m,ug,vg,z0,ebs,psis,aks,
      &              bs,rhoc,rhocw,ebc,anu0,bs0,wmin,wmax,tw
 
       common /cb45/ u(n),v(n),w(n)
+      double precision u, v, w
       common /cb46/ ustern,gclu,gclt
+      double precision ustern, gclu, gclt
       common /cb47/ zb(nb),dzb(nb),dzbw(nb),tb(nb),eb(nb),ak(nb),d(nb),
      &              ajb,ajq,ajl,ajt,ajd,ajs,ds1,ds2,ajm,reif,tau,trdep
+      real (kind=dp) :: zb, dzb, dzbw, tb, eb, ak, d,
+     &     ajb, ajq, ajl, ajt, ajd, ajs, ds1, ds2, ajm, reif, tau, trdep
       common /cb48/ sk,sl,dtrad(n),dtcon(n)
       double precision sk, sl, dtrad, dtcon
 
@@ -1489,12 +1581,16 @@
       double precision enw,ew,rn,rw,en,e,dew,rq
 
       common /cb52/ ff(nkt,nka,n),fsum(n),nar(n)
+      real (kind=dp) :: ff, fsum
+      integer :: nar
+
       common /cb53/ theta(n),thetl(n),t(n),talt(n),p(n),rho(n)
-      double precision theta, thetl, t, talt, p, rho
+      real(kind=dp) :: theta, thetl, t, talt, p, rho
       common /cb54/ xm1(n),xm2(n),feu(n),dfddt(n),xm1a(n),xm2a(n)
+      real(kind=dp) :: xm1, xm2, feu, dfddt, xm1a, xm2a
 
       character *10 srname
-      dimension xsum(n)
+      real(kind=dp) :: xsum(n)
       srname='          '
       write (26,6000) it,dt,lday,lst,lmin
  6000 format (//,6x,i8,'-th. timestep dt = ',f4.1,' sec ',i2,' day ',
@@ -1516,7 +1612,7 @@
       xxm1=0.
       xxm2=0.
       do k=1,n
-!         xxm1=xm1(k)*detw(k)+xxm1    
+!         xxm1=xm1(k)*detw(k)+xxm1
          xxm1=xm1(k)*detw(k)*rho(k)*1000+xxm1
          xxm2=xm2(k)*detw(k)*1000+xxm2
 ! xxm1 in g/m**2 vapour content of atm., xxm2 in g/m**2 liquid water content of atm.
@@ -1559,7 +1655,7 @@
          xsum(k)=xsum(k)*1.e+09
          xxsum=xxsum+xsum(k)*detw(k)
       enddo
-      write (26,6240) 
+      write (26,6240)
  6240 format (/,6x,'aerosol mass in ug m**-3 in layers 2 - nf')
       write (26,6250) xsum
  6250 format (1x,15f8.3)
@@ -1570,7 +1666,7 @@
 ! 142  format (6x,9d12.4)
 
       call ion_mass (srname)
-      
+
 !      do k=2,nf
 !         do kc=1,nkc_l
 !            write (*,141) (k,kc,(dss(k,l,kc),l=1,lsp))
@@ -1757,7 +1853,7 @@
      &           bg(2,l,2)/am3(il(2)),bg(1,l,2)/am3(il(2))
      &           ,bg(2,l,3)/am3(il(3)),bg(1,l,3)/am3(il(3))
          enddo
-! 6170 format (//,'reaction rates integrated over 1 hour, converted to' 
+! 6170 format (//,'reaction rates integrated over 1 hour, converted to'
  6170 format (//,'accumulated reaction rates [mol/(m^3(air) s)]')
  6180 format (/,'height = ',19x,f10.2,' m',4x,f10.2,' m',4x,f10.2,' m')
 
@@ -1806,7 +1902,7 @@
      & sion1(13,kc,k)*xfac(k),sion1(21,kc,k),k=nf,1,-1)
  6020 format (f10.1,10e10.3)
  1033 continue
-      
+
       write (60,*) 'done with profc'
 
       end subroutine profc
@@ -1931,7 +2027,7 @@
  6020 format (/,'#layer',38x,'totrad(l,i) l=7,18 (IR)')
  6021 format (i4,12f10.3)
 
- 6030 format (/,'#level',4x,'pres',4x,'temp',10x'fs1',10x,'fs2',12x,
+ 6030 format (/,'#level',4x,'pres',4x,'temp',10x,'fs1',10x,'fs2',12x,
      &          'ss',11x,'fl1',11x,'fl2')
  6031 format(i4,f10.1,f8.1,5f14.3)
 

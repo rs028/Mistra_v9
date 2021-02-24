@@ -209,6 +209,8 @@ subroutine intrad
 !                              rewritten interpolation, coding standards for variable names
 !
 ! 18-Feb-2019   Josue Bock   Stop the program using abortM
+!
+! 22-Sep-2019   Josue Bock   Print the warning messages only if jaer==1. Remove format statements (coding standards)
 
 ! == End of header =============================================================
 
@@ -244,6 +246,8 @@ subroutine intrad
   implicit none
 
 ! Local parameters:
+  character (len=*), parameter :: cpfmt1='(3e16.8)'                   ! input format to read tabulated files
+  character (len=*), parameter :: cpfmt2='(a,2(i3,x,a),2(f9.4,x,a))'  ! output format for warning messages
   integer, parameter :: na0 = 11  ! Number of tabulated values, volume fraction of water
   integer, parameter :: nw0 = 40  ! Number of tabulated values, total aerosol radius
 
@@ -307,8 +311,6 @@ subroutine intrad
   fname=TRIM(cinpdir)//"ozeanlw.dat"
   open (unit=ifun+5, file=fname, status='old')
 
-! input format to read these files
-5000 format (3e16.8)
 
   do jaer=1,jptaerrad  ! jaer=1 urban, jaer=2 rural, jaer=3 ocean
 
@@ -317,7 +319,7 @@ subroutine intrad
      do ja0=1,na0
         do jw0=1,nw0
            do jb=1,mbs
-              read(ifun,5000) qabs0(jb,jw0,ja0),qext0(jb,jw0,ja0),asym0(jb,jw0,ja0)
+              read(ifun,cpfmt1) qabs0(jb,jw0,ja0),qext0(jb,jw0,ja0),asym0(jb,jw0,ja0)
            enddo
         enddo
      enddo
@@ -326,7 +328,7 @@ subroutine intrad
      do ja0=1,na0
         do jw0=1,nw0
            do jb=mbs+1,mb
-              read(ifun,5000) qabs0(jb,jw0,ja0),qext0(jb,jw0,ja0),asym0(jb,jw0,ja0)
+              read(ifun,cpfmt1) qabs0(jb,jw0,ja0),qext0(jb,jw0,ja0),asym0(jb,jw0,ja0)
            enddo
         enddo
      enddo
@@ -348,12 +350,18 @@ subroutine intrad
               ! case rq < xw0(1), warn user, set iw0 and dx values as if xw1=xw0(1)
               iw0 = 2
               dx  = 0._dp
-              write(jpfunout,*)'Warning: in SR intrad, rq < xw0(1)',jka,jkt,xw1
+              if (jaer==1) then ! Print this message only once
+                 write(jpfunout,cpfmt2)'Warning: in SR intrad, rq < xw0(1), jka =',jka,'jkt =',jkt,'rq =', &
+                      & xw1,'the value tabulated for xw0(1) =',xw0(1),'will be used.'
+              end if
            else if (xw1 > xw0(nw0)) then
               ! case rq > xw0(nw0), warn user, set iw0 and dx values as if xw1=xw0(nw0)
               iw0 = nw0
               dx  = 1._dp
-              write(jpfunout,*)'Warning: in SR intrad, rq > xw0(nw0)',jka,jkt,xw1
+              if (jaer==1) then ! Print this message only once
+                 write(jpfunout,cpfmt2)'Warning: in SR intrad, rq > xw0(nw0), jka =',jka,'jkt =',jkt,'rq =', &
+                      & xw1,'the value tabulated for xw0(nw0) =',xw0(nw0),'will be used.'
+              end if
            else
               ! general case: xw0(iw-1) < rq <= xw0(iw)
               iw0 = 2
@@ -452,6 +460,8 @@ subroutine ipdata
   !                          Also added a former common block /sol/ to remove hardcoded values from
   !                            the radiative code.
   !                          Final cleaning after Fortran90 conversion
+  !
+  ! 22-Sep-2019  Josue Bock  Remove format statements (coding standards)
 
 ! == End of header =============================================================
 
@@ -481,6 +491,10 @@ subroutine ipdata
        dp
 
   implicit none
+
+! Local parameters:
+  character (len=*), parameter :: cpfmt1='(a)'       ! format for separation lines
+  character (len=*), parameter :: cpfmt2='(8e16.8)'  ! format for tabulated data
 
 ! Local scalars:
   character (len=len_trim(cinpdir)+16) :: clfname
@@ -548,132 +562,128 @@ subroutine ipdata
   open(unit=jpfundatarad, file=clfname, status='old', iostat=istat)
   if (istat /= 0) call abortM ('Error in SR ipdata: cannot open radiation data file: '//clfname)
 
-! input formats to read this file
-10 format(a)
-11 format(8e16.8)
-
 ! planck table                 ! could be deleted if fst4 and plancktab are deleted
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) ttab
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) pibtab
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) ttab
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) pibtab
 ! effective droplet radii and radiation coefficients for water
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) ret
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) r2wt
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) b2wt
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) w2wt
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) g2wt
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) ret
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) r2wt
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) b2wt
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) w2wt
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) g2wt
 ! table of reference relative humidities and tabulated radiation coefficients for aerosols
 ! last index of seanew, saanew, ganew = aerosol type: 1=rural, 2=urban, 3=ocean, 4=background
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) feux
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) seanew
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) saanew
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) ganew
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) feux
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) seanew
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) saanew
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) ganew
 ! solar energy in the 6 SW spectral bands
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) s0b
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) s0b
 ! radiation coefficients for gas absorption for every spectral band
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk1
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) fk1o3
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk2
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c2h2o
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk3
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c3h2o
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk4
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c4h2o
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk5
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c5h2o
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk6
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c6h2o
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk7
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c7h2o
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk8
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c8h2o
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk9
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c9h2o
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk10
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c10h2o
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c10ch4
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c10n2o
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk11
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c11h2o
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c11ch4
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c11n2o
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk12
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c12o3
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c12h2o
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk13
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c13h2o
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk14
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c14hca
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c14hcb
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk15
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c15hca
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c15hcb
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk16
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c16h2o
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk17
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c17h2o
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) hk18
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) c18h2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk1
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) fk1o3
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk2
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c2h2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk3
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c3h2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk4
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c4h2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk5
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c5h2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk6
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c6h2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk7
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c7h2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk8
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c8h2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk9
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c9h2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk10
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c10h2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c10ch4
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c10n2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk11
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c11h2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c11ch4
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c11n2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk12
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c12o3
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c12h2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk13
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c13h2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk14
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c14hca
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c14hcb
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk15
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c15hca
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c15hcb
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk16
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c16h2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk17
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c17h2o
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) hk18
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) c18h2o
 ! unreduced ozone amount from Craig table
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) o3un
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) o3un
 ! coefficients for rayleigh scattering
-  read(jpfundatarad,10)
-  read(jpfundatarad,11) berayl
+  read(jpfundatarad,cpfmt1)
+  read(jpfundatarad,cpfmt2) berayl
 
   close(jpfundatarad)
 
